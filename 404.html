@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mozaic</title>
+    <script>
+      try {
+        sessionStorage.setItem("mozaic:spa-redirect-url", location.href);
+      } catch (error) {}
+      location.replace("/mozaic/");
+    </script>
+  </head>
+  <body>
+    <p>Mozaic으로 이동하고 있습니다.</p>
+    <a href="/mozaic/">Mozaic 열기</a>
+  </body>
+</html>
