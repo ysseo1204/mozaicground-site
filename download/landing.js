@@ -31,6 +31,11 @@
     app_store: config.appStoreUrl,
     google_play: config.playStoreUrl
   };
+  const requestedStoreParam = new URLSearchParams(window.location.search).get("store");
+  const requestedStore =
+    requestedStoreParam === "app_store" || requestedStoreParam === "google_play"
+      ? requestedStoreParam
+      : "";
   let measurementConsent = readStoredValue(CONSENT_KEY);
   let googleTagLoaded = false;
 
@@ -119,6 +124,11 @@
           : "사용 중인 기기에 맞는 스토어를 선택하세요.";
     } else if (availableCount === 1) {
       status = "현재 공개된 스토어의 다운로드 링크를 이용할 수 있습니다.";
+    } else if (requestedStore) {
+      status =
+        requestedStore === "app_store"
+          ? "App Store 공개 주소가 연결되면 이 QR에서 바로 이동합니다."
+          : "Google Play 공개 주소가 연결되면 이 QR에서 바로 이동합니다.";
     }
 
     statusNodes.forEach((node) => {
@@ -306,6 +316,12 @@
 
   const deviceOs = detectDeviceOs();
   const campaign = captureCampaign();
+
+  if (requestedStore && storeUrls[requestedStore]) {
+    window.location.replace(storeUrls[requestedStore]);
+    return;
+  }
+
   document.body.dataset.deviceOs = deviceOs;
   document.body.classList.add(`device-${deviceOs}`);
   document.documentElement.dataset.campaign = Object.keys(campaign).length ? "present" : "none";

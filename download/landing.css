@@ -862,35 +862,45 @@ button {
   width: 194px;
 }
 
-.qr-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px;
+.store-qr-grid {
+  width: 100%;
+  max-width: 400px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.store-qr-card {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 14px;
   border: 1px solid var(--line);
   border-radius: 15px;
   background: #080908;
 }
 
-.qr-card img {
-  width: 90px;
-  height: 90px;
-  padding: 7px;
-  border-radius: 8px;
+.store-qr-card .qr-code {
+  width: 118px;
+  height: 118px;
+  padding: 8px;
+  border-radius: 10px;
   background: #fff;
 }
 
-.qr-card p {
+.store-qr-card figcaption {
   display: grid;
-  gap: 4px;
-  margin: 0;
+  justify-items: center;
+  gap: 2px;
+  text-align: center;
 }
 
-.qr-card strong {
+.store-qr-card strong {
   font-size: 15px;
 }
 
-.qr-card span {
+.store-qr-card span {
   color: var(--muted);
   font-size: 12px;
 }
@@ -1322,7 +1332,7 @@ button {
     gap: 38px;
   }
 
-  .qr-card {
+  .store-qr-grid {
     display: none;
   }
 
