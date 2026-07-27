@@ -39,10 +39,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-body.has-mobile-download {
-  padding-bottom: 84px;
-}
-
 img {
   display: block;
   max-width: 100%;
@@ -1414,6 +1410,10 @@ button {
 
   .mobile-download:not([hidden]) {
     display: block;
+  }
+
+  body.consent-open .mobile-download {
+    display: none;
   }
 
   .consent-banner {

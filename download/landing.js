@@ -231,6 +231,7 @@
     const banner = document.querySelector("[data-consent-banner]");
     if (!banner) return;
     banner.hidden = false;
+    document.body.classList.add("consent-open");
     const preferredButton =
       measurementConsent === "granted"
         ? banner.querySelector("[data-consent-accept]")
@@ -241,6 +242,7 @@
   function hideConsentBanner() {
     const banner = document.querySelector("[data-consent-banner]");
     if (banner) banner.hidden = true;
+    document.body.classList.remove("consent-open");
   }
 
   function eventPlacement(link) {
