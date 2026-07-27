@@ -424,52 +424,6 @@ button {
   transform: translateX(-50%);
 }
 
-.signal-card {
-  position: absolute;
-  z-index: 6;
-  display: grid;
-  gap: 2px;
-  min-width: 194px;
-  padding: 13px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  background: rgba(9, 10, 9, 0.88);
-  box-shadow: 0 15px 32px rgba(0, 0, 0, 0.34);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-
-.signal-card span {
-  color: #aeb2ab;
-  font-size: 11px;
-}
-
-.signal-card strong {
-  font-size: 14px;
-}
-
-.signal-card-top {
-  top: 62px;
-  right: 0;
-}
-
-.signal-card-bottom {
-  bottom: 74px;
-  left: 6px;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
-.signal-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--lime);
-  box-shadow: 0 0 14px var(--lime);
-}
-
 .trust-strip {
   border-block: 1px solid var(--line);
   background: #0a0b0a;
@@ -1263,16 +1217,6 @@ button {
     right: calc(50% - min(46vw, 170px));
   }
 
-  .signal-card-top {
-    top: 46px;
-    right: 0;
-  }
-
-  .signal-card-bottom {
-    bottom: 42px;
-    left: 0;
-  }
-
   .trust-grid {
     grid-template-columns: 1fr;
   }
@@ -1432,14 +1376,6 @@ button {
     min-height: 510px;
   }
 
-  .signal-card {
-    min-width: 170px;
-    padding: 11px 13px;
-  }
-
-  .signal-card-top {
-    right: -6px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
