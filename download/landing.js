@@ -37,7 +37,7 @@
       ? requestedStoreParam
       : "";
   let measurementConsent = readStoredValue(CONSENT_KEY);
-  let googleTagLoaded = false;
+  let googleTagLoaded = Boolean(window.MOZAIC_GOOGLE_ADS_TAG_LOADED);
 
   function readStoredValue(key) {
     try {
@@ -170,13 +170,16 @@
       window.dataLayer.push(arguments);
     };
 
+    const measurementState = measurementConsent === "granted" ? "granted" : "denied";
     window.gtag("consent", "default", {
-      ad_storage: "denied",
-      ad_user_data: "denied",
+      ad_storage: measurementState,
+      ad_user_data: measurementState,
       ad_personalization: "denied",
-      analytics_storage: "denied",
+      analytics_storage: measurementState,
       wait_for_update: 500
     });
+    window.gtag("set", "allow_ad_personalization_signals", false);
+    loadGoogleTag();
 
     if (measurementConsent === "granted") {
       grantMeasurement();
@@ -195,19 +198,27 @@
   }
 
   function loadGoogleTag() {
-    if (googleTagLoaded || !analyticsConfigured) return;
-    googleTagLoaded = true;
+    if (!analyticsConfigured) return;
 
     const primaryTagId = config.ga4Id || googleAdsTagId();
-    const script = document.createElement("script");
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(primaryTagId)}`;
-    document.head.appendChild(script);
+    if (!googleTagLoaded) {
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(primaryTagId)}`;
+      document.head.appendChild(script);
+      window.gtag("js", new Date());
+      googleTagLoaded = true;
+      window.MOZAIC_GOOGLE_ADS_TAG_LOADED = true;
+    }
 
-    window.gtag("js", new Date());
     if (config.ga4Id) window.gtag("config", config.ga4Id);
     const adsId = googleAdsTagId();
-    if (adsId) window.gtag("config", adsId);
+    if (adsId && window.MOZAIC_GOOGLE_ADS_TAG_ID !== adsId) {
+      window.gtag("config", adsId, {
+        allow_ad_personalization_signals: false
+      });
+      window.MOZAIC_GOOGLE_ADS_TAG_ID = adsId;
+    }
   }
 
   function grantMeasurement() {
@@ -216,7 +227,7 @@
     window.gtag("consent", "update", {
       ad_storage: "granted",
       ad_user_data: "granted",
-      ad_personalization: "granted",
+      ad_personalization: "denied",
       analytics_storage: "granted"
     });
     loadGoogleTag();
@@ -287,6 +298,8 @@
     if (config.googleAdsSendTo) {
       window.gtag("event", "conversion", {
         send_to: config.googleAdsSendTo,
+        value: 1.0,
+        currency: "KRW",
         event_callback: navigate,
         transport_type: "beacon"
       });
