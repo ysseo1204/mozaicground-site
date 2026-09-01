@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const tagId = "AW-18375730473";
+  const tagId = "";
   if (!/^AW-\d+$/.test(tagId)) return;
 
   const consentKey = "mozaic_measurement_consent_v1";
