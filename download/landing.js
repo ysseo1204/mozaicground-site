@@ -38,6 +38,7 @@
       : "";
   let measurementConsent = readStoredValue(CONSENT_KEY);
   let googleTagLoaded = Boolean(window.MOZAIC_GOOGLE_ADS_TAG_LOADED);
+  let analyticsInitialized = false;
 
   function readStoredValue(key) {
     try {
@@ -75,6 +76,7 @@
     });
 
     if (Object.keys(incoming).length > 0) {
+      if (measurementConsent !== "granted") return incoming;
       try {
         window.sessionStorage.setItem(CAMPAIGN_KEY, JSON.stringify(incoming));
       } catch {
@@ -172,14 +174,13 @@
 
     const measurementState = measurementConsent === "granted" ? "granted" : "denied";
     window.gtag("consent", "default", {
-      ad_storage: measurementState,
-      ad_user_data: measurementState,
+      ad_storage: config.googleAdsSendTo ? measurementState : "denied",
+      ad_user_data: config.googleAdsSendTo ? measurementState : "denied",
       ad_personalization: "denied",
       analytics_storage: measurementState,
       wait_for_update: 500
     });
     window.gtag("set", "allow_ad_personalization_signals", false);
-    loadGoogleTag();
 
     if (measurementConsent === "granted") {
       grantMeasurement();
@@ -198,7 +199,7 @@
   }
 
   function loadGoogleTag() {
-    if (!analyticsConfigured) return;
+    if (!analyticsConfigured || measurementConsent !== "granted") return;
 
     const primaryTagId = config.ga4Id || googleAdsTagId();
     if (!googleTagLoaded) {
@@ -211,7 +212,13 @@
       window.MOZAIC_GOOGLE_ADS_TAG_LOADED = true;
     }
 
-    if (config.ga4Id) window.gtag("config", config.ga4Id);
+    if (config.ga4Id && !analyticsInitialized) {
+      window.gtag("config", config.ga4Id, {
+        allow_google_signals: false,
+        allow_ad_personalization_signals: false
+      });
+      analyticsInitialized = true;
+    }
     const adsId = googleAdsTagId();
     if (adsId && window.MOZAIC_GOOGLE_ADS_TAG_ID !== adsId) {
       window.gtag("config", adsId, {
@@ -223,20 +230,28 @@
 
   function grantMeasurement() {
     measurementConsent = "granted";
+    if (config.ga4Id) window[`ga-disable-${config.ga4Id}`] = false;
     writeStoredValue(CONSENT_KEY, measurementConsent);
     window.gtag("consent", "update", {
-      ad_storage: "granted",
-      ad_user_data: "granted",
+      ad_storage: config.googleAdsSendTo ? "granted" : "denied",
+      ad_user_data: config.googleAdsSendTo ? "granted" : "denied",
       ad_personalization: "denied",
       analytics_storage: "granted"
     });
     loadGoogleTag();
+    captureCampaign();
     hideConsentBanner();
   }
 
   function denyMeasurement() {
     measurementConsent = "denied";
     writeStoredValue(CONSENT_KEY, measurementConsent);
+    try {
+      window.sessionStorage.removeItem(CAMPAIGN_KEY);
+    } catch {
+      // Storage can be unavailable.
+    }
+    if (config.ga4Id) window[`ga-disable-${config.ga4Id}`] = true;
     if (window.gtag) {
       window.gtag("consent", "update", {
         ad_storage: "denied",
@@ -246,6 +261,8 @@
       });
     }
     hideConsentBanner();
+    // Unload the tag after withdrawal so it cannot send further automatic events.
+    if (googleTagLoaded) window.location.reload();
   }
 
   function showConsentBanner() {
